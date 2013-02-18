@@ -1,0 +1,6 @@
+*.pyc
+*~
+/sessions/*
+/logs/*
+/data
+/cache/*

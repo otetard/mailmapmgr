@@ -1,0 +1,28 @@
+## -*- coding: utf-8 -*-
+
+<%inherit file="../base.mako"/>
+
+<%block name="title">Rechercher un alias</%block>
+
+<form method="GET" action="">
+  <fieldset>
+    <p>
+      <label for="q">Recherche : </label>
+      <input type="text" name="q" value="${q}"/>
+    </p>
+    <p>
+      <input type="submit" value="Rechercher"/>
+    </p>
+  </fieldset>
+</form>
+
+<h2>Résultats</h2>
+
+% if len(results) == 0:
+    Aucun résultat n'a été trouvé
+    <% return %>
+% endif
+
+    % for row in results:
+        ${row}
+    % endfor
