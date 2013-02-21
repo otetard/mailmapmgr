@@ -329,10 +329,10 @@ class Mail_Account(Mailmap_Entry):
         self.password_entry.change_password(password)
 
     @staticmethod
-    def create(mail, password):
-        return Mail_Account(Field_Mail(mail, Field.MAIL_NORMAL),
-                            Field_Password(password, Field.PASSWORD_MD5),
-                            Field_Target("local", Field.TARGET_LOCAL))
+    def create(mailmap, mail, password):
+        return Mail_Account(Field_Mail(mailmap, mail, Field.MAIL_NORMAL),
+                            Field_Password(mailmap, password, Field.PASSWORD_MD5),
+                            Field_Target(mailmap, "local", Field.TARGET_LOCAL))
 
 
 class Mail_Alias(Mailmap_Entry):
@@ -349,10 +349,11 @@ class Mail_Alias(Mailmap_Entry):
         self.target_entry.add_target(alias)
 
     @staticmethod
-    def create(mail, targets):
-        return Mail_Alias(Field_Mail(mail, Field.MAIL_NORMAL),
-                          Field_Password("", Field.PASSWORD_NOPASSWORD),
-                          Field_Target(targets, Field.TARGET_ALIAS))
+    def create(mailmap, mail, targets):
+        return Mail_Alias(mailmap,
+                          Field_Mail(mailmap, mail, Field.MAIL_NORMAL),
+                          Field_Password(mailmap, "", Field.PASSWORD_NOPASSWORD),
+                          Field_Target(mailmap, targets, Field.TARGET_ALIAS))
 
 
 class Mail_Pipe(Mailmap_Entry):

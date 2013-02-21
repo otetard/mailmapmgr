@@ -484,7 +484,7 @@ class AliasManager():
 
             if len(error_messages) == 0:
                 try:
-                    mgr.add_new_entry(Mail_Alias.create(mail_full, targets))
+                    mgr.add_new_entry(Mail_Alias.create(mgr, mail_full, targets))
                     raise cherrypy.HTTPRedirect("/alias/view/?q={0}&pre=new".format(mail_full), 302)
                 except Mailmap_Exception, e:
                     error_messages.append(u"Une erreur est apparue lors de la création de l'alias : <mail>{0}</mail>".format(e))
