@@ -18,24 +18,6 @@ from lib.external.ordereddict import OrderedDict
 
 debugging = True
 
-# def synchronized(func):
-#     '''Decorator to lock and unlock a method (Phillip J. Eby).
-
-#     @param func Method to decorate
-#     '''
-#     def wrapper(self, *__args, **__kw):
-#         print "LOCK"
-#         self._lock.acquire()
-#         try:
-#             return func(self, *__args, **__kw)
-#         finally:
-#             self._lock.release()
-#             print "RELEASE"
-#     wrapper.__name__ = func.__name__
-#     wrapper.__dict__ = func.__dict__
-#     wrapper.__doc__ = func.__doc__
-#     return wrapper
-
 def check_email(email):
     """Check if supplied email address is valid"""
 
@@ -68,9 +50,6 @@ class Field:
         self.subtype = subtype
 
 class Field_Mail(Field):
-
-    # def __hash__(self):
-    #     return hash(str(self.value))
 
     @staticmethod
     def parse_field(value):
@@ -182,6 +161,7 @@ class Field_Comment(Field):
 
 class Mailmap_Exception(Exception):
     pass
+
 
 class Mailmap:
     """
@@ -326,6 +306,7 @@ class Mailmap_Entry():
     def change_password(self, password):
         raise Mailmap_Entry_Exception("Unavailable fonction for mail alias")
 
+
 # TODO
 class Mail_Comment():
     def __init__(self, comment):
@@ -336,6 +317,7 @@ class Mail_Comment():
 
     def __str__(self):
         return "{0}".format(self.comment)
+
 
 class Mail_Account(Mailmap_Entry):
 
@@ -364,11 +346,14 @@ class Mail_Alias(Mailmap_Entry):
                           Field_Password("", Field.PASSWORD_NOPASSWORD),
                           Field_Target(targets, Field.TARGET_ALIAS))
 
+
 class Mail_Pipe(Mailmap_Entry):
     pass
 
+
 class Mail_Catchall(Mailmap_Entry):
     pass
+
 
 class Mail_Domain_Redirect(Mailmap_Entry):
     pass
