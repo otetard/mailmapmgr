@@ -25,6 +25,8 @@
 <h2>Liste des choses à faire...</h2>
 
 <ul>
+  <li>Afficher un bandeau d'« alerte » lorsque la configuration a été modifiée mais qu'elle n'a pas encore été appliquée</li>
+  <li>Avant de valider une modification d'un alias, s'assurer qu'il s'agit bien du fichier pour lequel la modification a été demandée (vérifier si il n'y a pas de conflit de modification)</li>
   <li>Permettre une recherche sur les adresse cibles aussi</li>
   <li>Permettre la gestion des droits d'accès (<s>super-administrateurs</s>, autorisations par domaines, etc.)</li>
   <li>Permettre la gestion des comptes classiques :</li>
@@ -44,4 +46,10 @@
   <li><s>Permettre la gestion des comptes utilisateurs</s></li>
   <li><s>Permettre de déployer un nouveau fichier <tt>mailmap</tt> (via <tt>bearmail-update</tt>)</s></li>
   <li><s>Permettre de relire le fichier <tt>mailmap</tt> en cas de modification</s></li>
+</ul>
+
+<h2>Bugs connus</h2>
+
+<ul>
+  <li>Le fichier mailmap n'est pas écrit sur le disque en cas de modification d'un alias.</li>
 </ul>
