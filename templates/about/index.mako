@@ -51,5 +51,5 @@
 <h2>Bugs connus</h2>
 
 <ul>
-  <li>Le fichier mailmap n'est pas écrit sur le disque en cas de modification d'un alias.</li>
+  <li><s>Le fichier mailmap n'est pas écrit sur le disque en cas de modification d'un alias.</s></li>
 </ul>
