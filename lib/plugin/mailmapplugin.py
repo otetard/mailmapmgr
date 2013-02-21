@@ -38,8 +38,8 @@ class MailmapEnginePlugin(plugins.Monitor):
        return self.mailmap_engine
 
     def mailmap_commit(self):
-        self.bus.log("++++++++++++++++++++++++ Mailmap commit: TBD +++++++++++++++++++")
         if self.mailmap_engine:
+            self.bus.log("Writing mailmap file to disk")
             self.mailmap_engine.sync_to_disk()
 
     def run(self):
