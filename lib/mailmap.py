@@ -45,14 +45,15 @@ class Field:
     def __str__(self):
         return self.value
 
-    def __init__(self, value, subtype = None):
+    def __init__(self, mailmap, value, subtype=None):
+        self.mailmap = mailmap
         self.value = value
         self.subtype = subtype
 
 class Field_Mail(Field):
 
     @staticmethod
-    def parse_field(value):
+    def parse_field(mailmap, value):
         """Check if supplied field is a valid email field. This field
         might be an email address or a catchall address
         (*@example.org). For this special case, we just replace "*" by
@@ -65,19 +66,19 @@ class Field_Mail(Field):
             raise Field_Exception("Invalid email address: {0}".format(value))
 
         if re.match('^\*@', value):
-            return Field_Mail(value, Field.MAIL_CATCHALL)
+            return Field_Mail(mailmap, value, Field.MAIL_CATCHALL)
         else:
-            return Field_Mail(value, Field.MAIL_NORMAL)
+            return Field_Mail(mailmap, value, Field.MAIL_NORMAL)
 
 class Field_Password(Field):
 
     @staticmethod
-    def parse_field(value):
+    def parse_field(mailmap, value):
         if value == "":
-            return Field_Password(value, Field.PASSWORD_NOPASSWORD)
+            return Field_Password(mailmap, value, Field.PASSWORD_NOPASSWORD)
 
         if re.match("^[0-9a-f]{32}$", value):
-            return Field_Password(value, Field.PASSWORD_MD5)
+            return Field_Password(mailmap, value, Field.PASSWORD_MD5)
 
         raise Field_Exception("Invalid password supplied: {0}".format(value))
 
@@ -126,12 +127,12 @@ class Field_Target(Field):
         print self.value
 
     @staticmethod
-    def parse_field(value):
+    def parse_field(mailmap, value):
         if value == "local":
-            return Field_Target(value, Field.TARGET_LOCAL)
+            return Field_Target(mailmap, value, Field.TARGET_LOCAL)
 
         if value[0] == "|":
-            return Field_Target(value, Field.TARGET_PIPE)
+            return Field_Target(mailmap, value, Field.TARGET_PIPE)
 
         (newfield, substn) = re.subn("^\*@", "x@", value)
 
@@ -139,7 +140,7 @@ class Field_Target(Field):
             if check_email(newfield) == False:
                 raise Field_Exception("Invalid domain: {0}".format(value))
             else:
-                return Field_Target(value, Field_Target.TARGET_DOMAIN)
+                return Field_Target(mailmap, value, Field_Target.TARGET_DOMAIN)
 
         targets = []
         for email in string.split(value, ','):
@@ -147,13 +148,13 @@ class Field_Target(Field):
                 raise Field_Exception("Unable to parse email address ({0}) in such entry: {1}".format(email, value))
             targets.append(email)
 
-        return Field_Target(targets, Field_Target.TARGET_ALIAS)
+        return Field_Target(mailmap, targets, Field_Target.TARGET_ALIAS)
 
 class Field_Comment(Field):
 
     @staticmethod
-    def parse_field(value):
-        return Field_Comment(value)
+    def parse_field(mailmap, value):
+        return Field_Comment(mailmap, value)
 
     def __str__(self):
         return self.value
@@ -259,23 +260,23 @@ class Mailmap:
                     line = line.strip()
 
                     if re.match("^($|#)", line):
-                        new_entry = Mail_Comment(Field_Comment.parse_field(line))
+                        new_entry = Mail_Comment(self, Field_Comment.parse_field(self, line))
                     else:
                         unparsed_fields = string.split(line, ":")
 
                         if not len(unparsed_fields) == 3:
                             raise Mailmap_Exception("Invalid mailmap entry, 3 arguments needed instead of {0}.".format(len(unparsed_fields)))
 
-                        mail = Field_Mail.parse_field(unparsed_fields[0])
-                        password = Field_Password.parse_field(unparsed_fields[1])
-                        target = Field_Target.parse_field(unparsed_fields[2])
+                        mail = Field_Mail.parse_field(self, unparsed_fields[0])
+                        password = Field_Password.parse_field(self, unparsed_fields[1])
+                        target = Field_Target.parse_field(self, unparsed_fields[2])
 
                         format = mail.subtype | password.subtype | target.subtype
 
                         if not format in valid_formats:
                             raise Mailmap_Exception("Invalid format for mailmap entry: {0}".format(line))
 
-                        new_entry = valid_formats[format](mail, password, target)
+                        new_entry = valid_formats[format](self, mail, password, target)
 
                     self.add_new_entry(new_entry)
 
@@ -286,7 +287,8 @@ class Mailmap_Entry_Exception(Exception):
 
 class Mailmap_Entry():
 
-    def __init__(self, mail_entry, password_entry, target_entry):
+    def __init__(self, mailmap, mail_entry, password_entry, target_entry):
+        self.mailmap = mailmap
         self.mail_entry = mail_entry
         self.password_entry = password_entry
         self.target_entry = target_entry
@@ -309,7 +311,8 @@ class Mailmap_Entry():
 
 # TODO
 class Mail_Comment():
-    def __init__(self, comment):
+    def __init__(self, mailmap, comment):
+        self.mailmap = mailmap
         self.comment = comment
 
     def get_as_key(self):
