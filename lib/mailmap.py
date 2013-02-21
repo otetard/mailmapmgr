@@ -325,6 +325,7 @@ class Mail_Comment():
 class Mail_Account(Mailmap_Entry):
 
     def change_password(self, password):
+        self.mailmap.updated = True
         self.password_entry.change_password(password)
 
     @staticmethod
@@ -333,14 +334,18 @@ class Mail_Account(Mailmap_Entry):
                             Field_Password(password, Field.PASSWORD_MD5),
                             Field_Target("local", Field.TARGET_LOCAL))
 
+
 class Mail_Alias(Mailmap_Entry):
     def remove_target(self, alias):
+        self.mailmap.updated = True
         self.target_entry.remove_target(alias)
 
     def update_target(self, targets):
+        self.mailmap.updated = True
         self.target_entry.update_target(targets)
 
     def add_target(self, alias):
+        self.mailmap.updated = True
         self.target_entry.add_target(alias)
 
     @staticmethod
