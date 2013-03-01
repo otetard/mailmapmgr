@@ -82,14 +82,16 @@ class UserController(object):
                     'ok_messages': [msg] if msg is not None else None,
                     }
 
+        # Authentication successful
         if User.authenticate(db, username, password):
-            # Authentication successful
+            cherrypy.log("[User] Login sucessfull: {user} from {ip}".format(user=username, ip=cherrypy.request.remote.ip))
             cherrypy.session.regenerate()
             cherrypy.session[SESSION_KEY] = cherrypy.request.login = username
             raise cherrypy.HTTPRedirect(from_page or "/")
 
 
         # Authentication failed
+        cherrypy.log("[User] Login failed: {user} from {ip}".format(user=username, ip=cherrypy.request.remote.ip))
         username = cherrypy.session[SESSION_KEY] = cherrypy.request.login = None
         return {'user': username,
                 'auth_error': u"L'authentification a échoué (utilisateur ou mot de passe invalide)",
@@ -103,6 +105,8 @@ class UserController(object):
         if username:
             cherrypy.request.login = None
 
+        cherrypy.log("[User] {user} just logged off from {ip}".format(user=username, ip=cherrypy.request.remote.ip))
+
         raise cherrypy.HTTPRedirect(from_page or "/")
 
     @cherrypy.expose
@@ -113,8 +117,9 @@ class UserController(object):
         if username:
             user = User.get(db, username)
 
-            # Compte inexistant
             if user:
+                cherrypy.log("[User] {user} asked to reset its password from {ip}".format(user=username, ip=cherrypy.request.remote.ip))
+
                 email = user.email
 
                 expiration_date = time.mktime((datetime.utcnow() + timedelta(1)).timetuple())
@@ -173,7 +178,6 @@ class UserController(object):
                         'user': user}
 
         return {'user': user}
-
 
     @cherrypy.expose
     @cherrypy.tools.mako(template="user/validate.mako")
@@ -352,6 +356,8 @@ class PostfixController():
         error_messages = None
 
         if confirm == "1":
+            cherrypy.log("[Postfix] {user} restarted Postfix".format(user=cherrypy.request.user.username))
+
             confirm = True
 
             # Restart Postfix
