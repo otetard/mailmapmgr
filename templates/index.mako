@@ -8,6 +8,11 @@
   Cet outil est encore en développement et contient certains bugs... Voir la <a href="/about/bugs">liste des bugs connus</a>. Vous pouvez <a href="mailto:olivier.tetard@miskin.fr">contacter Olivier</a> si vous rencontrez des problème !
 </div>
 
+<div class="alert alert-warning">
+  <button type="button" class="close" data-dismiss="alert">×</button>
+  Il faut bien penser à <a href="/postfix">redémarrer Postfix</a> pour appliquer la configuration !
+</div>
+
 <p>
   <em>Bienvenue sur l'outil hautement experimental de gestion des
   alias d'Attac.</em>
