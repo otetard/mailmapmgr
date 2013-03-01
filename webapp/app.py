@@ -611,8 +611,18 @@ class AboutManager():
     @cherrypy.expose
     @cherrypy.tools.mako(template="about/index.mako")
     def index(self):
-        return {'user': cherrypy.request.user
-            }
+        mgr = cherrypy.engine.publish('mailmap-session').pop()
+
+        return {'user': cherrypy.request.user,
+                }
+
+    @cherrypy.expose
+    @cherrypy.tools.mako(template="about/bugs.mako")
+    def bugs(self):
+        mgr = cherrypy.engine.publish('mailmap-session').pop()
+
+        return {'user': cherrypy.request.user,
+                }
 
 
 class MailmapManager():

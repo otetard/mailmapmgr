@@ -83,6 +83,9 @@ def escape_mail(text):
 
 	    <li class="menu-entree item">
 	      <a href="/about/">À propos</a>
+	      <ul class="menu-liste menu-items">
+		<li class="menu-entree item"><a href="/about/bugs">Bugs connus</a></li>
+	      </ul>
 	    </li>
 	  </ul>	  
 	</div>
