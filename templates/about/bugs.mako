@@ -8,6 +8,8 @@
 
 <ul>
   <li>Lors de la création ou de la modification d'une adresse, Mailmapmgr identifie que le fichier mailmap a changé (normal, c'est lui qui vient de le modifier) et du coup, entraine l'utilisateur vers une erreur 503. Il ne doit pas être nécessaire de redémarrer Mailmapmgr dans tous les cas.</li>
+  <li>Le fichier mailmap est parfois écrit sur disque sans raison (sur la page /user/login/ par exemple</li>
+  <li>Il faudrait supprimer les espaces autour des adresses lorsqu'elle sont soumises dans les formulaires (trim).</li>
   <li><s>Le fichier mailmap n'est pas écrit sur le disque en cas de modification d'un alias.</s></li>
 </ul>
 
