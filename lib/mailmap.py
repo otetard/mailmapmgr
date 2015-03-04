@@ -21,7 +21,7 @@ debugging = True
 def check_email(email):
     """Check if supplied email address is valid"""
 
-    if re.match('^[A-Za-z0-9\-\._\$\+]+@[A-Za-z0-9\-\.]+$', email):
+    if re.match('^[A-Za-z0-9\-\._\$\+=]+@[A-Za-z0-9\-\.]+$', email):
         return True
 
     return False
