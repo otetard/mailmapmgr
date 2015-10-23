@@ -22,9 +22,6 @@ class MakoTool(cherrypy.Tool):
         whatever dictionary the page handler returned.
         """
 
-        if cherrypy.response.status > 399:
-            return
-
         # retrieve the data returned by the handler
         data = cherrypy.response.body or {}
 
