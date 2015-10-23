@@ -12,9 +12,7 @@ import time
 import subprocess
 import shutil
 
-# Only for >= 2.7
-#from collections import OrderedDict
-from lib.external.ordereddict import OrderedDict
+from collections import OrderedDict
 
 debugging = True
 
@@ -124,7 +122,7 @@ class Field_Target(Field):
             raise Field_Exception("Alias must have at least one target")
 
         self.value = targets
-        print self.value
+        print(self.value)
 
     @staticmethod
     def parse_field(mailmap, value):
@@ -143,7 +141,7 @@ class Field_Target(Field):
                 return Field_Target(mailmap, value, Field_Target.TARGET_DOMAIN)
 
         targets = []
-        for email in string.split(value, ','):
+        for email in value.split(','):
             if not check_email(email):
                 raise Field_Exception("Unable to parse email address ({0}) in such entry: {1}".format(email, value))
             targets.append(email)
@@ -187,23 +185,23 @@ class Mailmap:
 
     def __str__(self):
         x = []
-        for (k, v) in self.content.items():
+        for (k, v) in list(self.content.items()):
             x.append(str(v))
 
         return "\n".join(x)
 
     def get_domain_list(self):
         domains = set()
-        for (k, v) in self.content.iteritems():
+        for (k, v) in self.content.items():
             try:
                 domains.add(k.split("@")[1])
-            except Exception, e:
+            except Exception as e:
                 pass
 
         return domains
 
     def get_aliases(self):
-        return dict((k, v) for k, v in self.content.iteritems() if isinstance(v, Mail_Alias))
+        return dict((k, v) for k, v in self.content.items() if isinstance(v, Mail_Alias))
 
     def add_new_entry(self, entry):
         self.updated = True
@@ -217,16 +215,16 @@ class Mailmap:
     def get_entry(self, key):
         try:
             return self.content[key]
-        except KeyError, e:
-            raise Mailmap_Exception(u"Entrée introuvable")
+        except KeyError as e:
+            raise Mailmap_Exception("Entrée introuvable")
 
     def remove_entry(self, key):
         try:
             entry = self.content.pop(key)
             self.updated = True
             return entry
-        except KeyError, e:
-            raise Mailmap_Exception(u"Entrée introuvable")
+        except KeyError as e:
+            raise Mailmap_Exception("Entrée introuvable")
 
     def sync_to_disk(self):
         if self.updated:
@@ -262,7 +260,7 @@ class Mailmap:
                     if re.match("^($|#)", line):
                         new_entry = Mail_Comment(self, Field_Comment.parse_field(self, line))
                     else:
-                        unparsed_fields = string.split(line, ":")
+                        unparsed_fields = line.split(":")
 
                         if not len(unparsed_fields) == 3:
                             raise Mailmap_Exception("Invalid mailmap entry, 3 arguments needed instead of {0}.".format(len(unparsed_fields)))
@@ -388,11 +386,12 @@ class Mail_Domain_Redirect(Mailmap_Entry):
 if __name__ == '__main__':
     import sys
 
-    mmap = Mailmap.parse_file('../map/mailmap')
+    mmap = Mailmap('../data/mailmap')
+    mmap.parse_file()
 
-    print mmap.get_domain_list()
+    print(mmap.get_domain_list())
 
-    print mmap.get_aliases()
+    print(mmap.get_aliases())
     sys.exit(42)
 
     #print mmap
@@ -417,7 +416,7 @@ if __name__ == '__main__':
 
     #print "--------------------------------------------------"
 
-    print mmap
+    print(mmap)
 
     #print "--------------------------------------------------"
 

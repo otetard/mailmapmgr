@@ -13,14 +13,14 @@ import hashlib
 
 import time
 from datetime import datetime, timedelta
-import urllib
+import urllib.request, urllib.parse, urllib.error
 
 import smtplib
 from email.mime.text import MIMEText
 
 messages = {
-    'pre_new': u"La création du compte <mail>{0}</mail> s'est correctement déroulée",
-    'pre_update': u"La modification du compte s'est correctement déroulée"
+    'pre_new': "La création du compte <mail>{0}</mail> s'est correctement déroulée",
+    'pre_update': "La modification du compte s'est correctement déroulée"
 }
 
 SESSION_KEY = "_cp_username"

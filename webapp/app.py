@@ -13,7 +13,7 @@ import hashlib
 
 import time
 from datetime import datetime, timedelta
-import urllib
+import urllib.request, urllib.parse, urllib.error
 
 import smtplib
 from email.mime.text import MIMEText
@@ -21,8 +21,8 @@ from email.mime.text import MIMEText
 import subprocess
 
 messages = {
-    'pre_new': u"La création du compte <mail>{0}</mail> s'est correctement déroulée",
-    'pre_update': u"La modification du compte s'est correctement déroulée"
+    'pre_new': "La création du compte <mail>{0}</mail> s'est correctement déroulée",
+    'pre_update': "La modification du compte s'est correctement déroulée"
 }
 
 SESSION_KEY = "_cp_username"
@@ -36,8 +36,8 @@ class UserController(object):
     # Crypto inspired by http://codeghar.wordpress.com/2011/09/01/aes-encryption-with-python/
 
     _block_size = 32
-    _interrupt = u'\u0001'
-    _pad = u'\u0000'
+    _interrupt = '\u0001'
+    _pad = '\u0000'
     _secret_key = cherrypy.config.get("user.key")
     _iv = cherrypy.config.get("user.iv4")
 
@@ -56,14 +56,14 @@ class UserController(object):
         try:
             cipher = AES.new(self._secret_key, AES.MODE_CBC, self._iv)
             return b64encode(cipher.encrypt(self._add_padding(data)))
-        except Exception, e:
+        except Exception as e:
             raise UserControllerException("Erreur cryptographique : {0}".format(e))
 
     def _aes_decrypt(self, enc_data):
         try:
             cipher = AES.new(self._secret_key, AES.MODE_CBC, self._iv)
             return self._strip_padding(cipher.decrypt(b64decode(enc_data)))
-        except Exception, e:
+        except Exception as e:
             raise UserControllerException("Erreur cryptographique : {0}".format(e))
 
     @cherrypy.expose
@@ -94,7 +94,7 @@ class UserController(object):
         cherrypy.log("[User] Login failed: {user} from {ip}".format(user=username, ip=cherrypy.request.remote.ip))
         username = cherrypy.session[SESSION_KEY] = cherrypy.request.login = None
         return {'user': username,
-                'auth_error': u"L'authentification a échoué (utilisateur ou mot de passe invalide)",
+                'auth_error': "L'authentification a échoué (utilisateur ou mot de passe invalide)",
                 'from_page': from_page}
 
     @cherrypy.expose
@@ -125,7 +125,7 @@ class UserController(object):
                 expiration_date = time.mktime((datetime.utcnow() + timedelta(1)).timetuple())
                 token = self._aes_encrypt("{0}|{1}".format(username, expiration_date))
 
-                url = "https://mailmapmgr.attac.org/user/validate?token={0}".format(urllib.quote(token))
+                url = "https://mailmapmgr.attac.org/user/validate?token={0}".format(urllib.parse.quote(token))
 
                 msg = MIMEText("""Bonjour\n\nPour changer votre mot de passe, veuillez cliquer sur le lien suivant : {0}""".format(url))
 
@@ -143,7 +143,7 @@ class UserController(object):
 
             return {
                 'user': cherrypy.request.user,
-                'error_messages': [u"Compte inexistant"]
+                'error_messages': ["Compte inexistant"]
                 }
 
         return {}
@@ -159,21 +159,21 @@ class UserController(object):
         if current_password is not None or password is not None or password2 is not None:
             try:
                 if not User.authenticate(db, user.username, current_password):
-                    raise UserControllerException(u"Mot de passe courant incorrect")
+                    raise UserControllerException("Mot de passe courant incorrect")
 
                 elif password != password2:
-                    raise UserControllerException(u"Les deux mot de passe ne concordent pas")
+                    raise UserControllerException("Les deux mot de passe ne concordent pas")
 
                 else:
                     User.set_password(db, user.username, password)
-                    msg = u"Le changement de mot de passse a bien été pris en compte"
+                    msg = "Le changement de mot de passse a bien été pris en compte"
 
                     # Utilisateur déjà authentifié
-                    return {'ok_messages': [u"Le changement de mot de passe s'est bien déroulé"],
+                    return {'ok_messages': ["Le changement de mot de passe s'est bien déroulé"],
                             'user': user,
                             }
 
-            except UserControllerException, e:
+            except UserControllerException as e:
                 return {'error_messages': [e],
                         'user': user}
 
@@ -201,17 +201,17 @@ class UserController(object):
                     return {'valid_token': True,
                             'username': username,
                             'token': token,
-                            'error_messages': [u"Les deux mot de passe ne concordent pas"]}
+                            'error_messages': ["Les deux mot de passe ne concordent pas"]}
                 else:
                     User.set_password(db, username, password)
-                    msg = u"Le changement de mot de passse a bien été pris en compte"
-                    raise cherrypy.HTTPRedirect(u"/user/login?msg={0}".format(msg))
+                    msg = "Le changement de mot de passse a bien été pris en compte"
+                    raise cherrypy.HTTPRedirect("/user/login?msg={0}".format(msg))
 
             return {'valid_token': True,
                     'username': username,
                     'token': token}
 
-        except UserControllerException, e:
+        except UserControllerException as e:
             return {'error_messages': [e]}
 
     @cherrypy.expose
@@ -249,10 +249,10 @@ class UserController(object):
             user_to_delete = User.get(db, username)
 
             if user_to_delete is None:
-                raise UserControllerException(u"Utilisateur inexistant")
+                raise UserControllerException("Utilisateur inexistant")
 
             if user_to_delete.is_admin is True and User.get_all_admin(cherrypy.request.db).count() == 1:
-                raise UserControllerException(u"Impossible de supprimer le dernier administrateur")
+                raise UserControllerException("Impossible de supprimer le dernier administrateur")
 
             if confirm is None:
                 return {'user': cherrypy.request.user,
@@ -265,16 +265,16 @@ class UserController(object):
                     db.delete(user_to_delete)
 
                     return {'user': cherrypy.request.user,
-                            'ok_messages': [u"L'utilisateur a bien été supprimé"]}
+                            'ok_messages': ["L'utilisateur a bien été supprimé"]}
 
-                except Exception, e:
+                except Exception as e:
                     return {'user': cherrypy.request.user,
-                            'error_messages': [u"Une erreur a été recontrée: {0}".format(e)]}
+                            'error_messages': ["Une erreur a été recontrée: {0}".format(e)]}
 
 
-        except UserControllerException, e:
+        except UserControllerException as e:
             return {'user': cherrypy.request.user,
-                    'error_messages': [u"Une erreur a été recontrée: {0}".format(e)]}
+                    'error_messages': ["Une erreur a été recontrée: {0}".format(e)]}
 
         return {}
 
@@ -288,17 +288,17 @@ class UserController(object):
             error_messages = []
 
             if not username:
-                error_messages.append(u"Identifiant utilisateur manquant")
+                error_messages.append("Identifiant utilisateur manquant")
             elif User.user_exists(db, username):
-                error_messages.append(u"Cet utilisateur existe déjà")
+                error_messages.append("Cet utilisateur existe déjà")
 
             if not email:
-                error_messages.append(u"Adresse électronique manquante")
+                error_messages.append("Adresse électronique manquante")
             elif not check_email(email):
-                error_messages.append(u"Adresse électronique invalide")
+                error_messages.append("Adresse électronique invalide")
 
             if not name:
-                error_messages.append(u"Nom de l'utilisateur manquant")
+                error_messages.append("Nom de l'utilisateur manquant")
 
 
             if len(error_messages) == 0:
@@ -313,7 +313,7 @@ class UserController(object):
 
                 return {
                     'user': cherrypy.request.user,
-                    'ok_messages': [u"Le compte <b>{0}</b> a bien été crée".format(username)]
+                    'ok_messages': ["Le compte <b>{0}</b> a bien été crée".format(username)]
                     }
 
 
@@ -365,9 +365,9 @@ class PostfixController():
                                        stderr=subprocess.PIPE)
             err = process.communicate()[1]
             if err != '':
-                error_messages = [u"Unable to restart Postfix: (<tt>{0}</tt>)".format(err)]
+                error_messages = ["Unable to restart Postfix: (<tt>{0}</tt>)".format(err)]
             else:
-                ok_messages = [u"La configuration a bien été appliquée"]
+                ok_messages = ["La configuration a bien été appliquée"]
 
         return {
             'error_messages': error_messages,
@@ -390,7 +390,7 @@ class SearchManager():
             r = mgr.get_entry(q)
             results.append(r)
             results.append(r.alias_entry)
-        except Exception, e:
+        except Exception as e:
             error_messages = e
 
         return {'q': q,
@@ -419,9 +419,9 @@ class AliasManager():
             search_str = "{0}@{1}".format(q, domain)
 
         if search_str and mode == "end":
-            mailmap_list = dict((key, value) for key, value in mailmap_list.iteritems() if key.endswith(search_str))
+            mailmap_list = dict((key, value) for key, value in mailmap_list.items() if key.endswith(search_str))
         elif search_str and mode == "full":
-            mailmap_list = dict((key, value) for key, value in mailmap_list.iteritems() if search_str in key)
+            mailmap_list = dict((key, value) for key, value in mailmap_list.items() if search_str in key)
 
         if pre is not None:
             ok_messages = [messages["pre_{0}".format(pre)].format(q)]
@@ -466,7 +466,7 @@ class AliasManager():
                 error_messages.append("<mail>{0}</mail> n'est pas une adresse valide".format(mail_full))
 
             try:
-                if isinstance(args['targets'], basestring):
+                if isinstance(args['targets'], str):
                     targets = [args["targets"]]
                 else:
                     targets = args['targets']
@@ -474,7 +474,7 @@ class AliasManager():
                 pass
 
             # Mail verification
-            targets = filter(None, targets) # Suppression des entrées vides
+            targets = [_f for _f in targets if _f] # Suppression des entrées vides
 
             if len(targets) == 0:
                 error_messages.append("Aucune adresse cible n'est définie")
@@ -484,16 +484,16 @@ class AliasManager():
 
             try:
                 if mgr.get_entry(mail_full) is not None:
-                    error_messages.append(u"<mail>{0}</mail> est une adresse déjà définie".format(mail_full))
-            except Mailmap_Exception, e:
+                    error_messages.append("<mail>{0}</mail> est une adresse déjà définie".format(mail_full))
+            except Mailmap_Exception as e:
                 pass
 
             if len(error_messages) == 0:
                 try:
                     mgr.add_new_entry(Mail_Alias.create(mgr, mail_full, targets))
                     raise cherrypy.HTTPRedirect("/alias/view/?q={0}&pre=new".format(mail_full), 302)
-                except Mailmap_Exception, e:
-                    error_messages.append(u"Une erreur est apparue lors de la création de l'alias : <mail>{0}</mail>".format(e))
+                except Mailmap_Exception as e:
+                    error_messages.append("Une erreur est apparue lors de la création de l'alias : <mail>{0}</mail>".format(e))
 
         return {'domain_list': domain_list,
                 'domain': domain,
@@ -529,12 +529,12 @@ class AliasManager():
 
             if submit is not None:
                 mgr.remove_entry(mail)
-                ok_messages = [u"L'alias <mail>{0}</mail> a bien été supprimé !".format(mail)]
+                ok_messages = ["L'alias <mail>{0}</mail> a bien été supprimé !".format(mail)]
                 targets = []
                 mail = None
 
-        except Mailmap_Exception, e:
-            error_messages.append(u"Une erreur est apparue lors de la suppression de l'alias <mail>{0}</mail> : {1}".format(mail, e))
+        except Mailmap_Exception as e:
+            error_messages.append("Une erreur est apparue lors de la suppression de l'alias <mail>{0}</mail> : {1}".format(mail, e))
             targets = []
             mail = None
 
@@ -578,15 +578,15 @@ class AliasManager():
             # UPDATE DATA
             if submit is not None:
 
-                if isinstance(args['targets'], basestring):
+                if isinstance(args['targets'], str):
                     new_targets = [args["targets"]]
                 else:
                     new_targets = args['targets']
 
-                new_targets = filter(None, new_targets) # Suppression des entrées vides
+                new_targets = [_f for _f in new_targets if _f] # Suppression des entrées vides
 
                 if len(new_targets) == 0:
-                    error_messages.append(u"Il est nécessaire de fournir au moins une adresse de destination.")
+                    error_messages.append("Il est nécessaire de fournir au moins une adresse de destination.")
 
                 for t in new_targets:
                     if not check_email(t):
@@ -603,8 +603,8 @@ class AliasManager():
                     'user': cherrypy.request.user
                     }
 
-        except Mailmap_Exception, e:
-            error_messages.append(u"<mail>{0}</mail> n'est pas une adresse connue".format(mail))
+        except Mailmap_Exception as e:
+            error_messages.append("<mail>{0}</mail> n'est pas une adresse connue".format(mail))
             return {'mail': None,
                     'targets': None,
                     'error_messages': error_messages,
@@ -656,7 +656,7 @@ class MailmapManager():
 
             cherrypy.session.delete()
 
-            return {'ok_messages': [u"Le compte administrateur par défaut a été crée. Attention à bien changer le mot de passe !"]
+            return {'ok_messages': ["Le compte administrateur par défaut a été crée. Attention à bien changer le mot de passe !"]
                     }
 
         raise cherrypy.HTTPError("403 Forbidden", "You are not allowed to access this resource.")
