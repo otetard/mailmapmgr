@@ -361,13 +361,12 @@ class PostfixController():
             confirm = True
 
             # Restart Postfix
-            process = subprocess.Popen(["/usr/bin/sudo", "/root/attac-mail/bearmail/bearmail-update"],
-                                       stderr=subprocess.PIPE)
-            err = process.communicate()[1]
-            if err != '':
-                error_messages = ["Unable to restart Postfix: (<tt>{0}</tt>)".format(err)]
-            else:
+            try:
+                process = subprocess.check_output(["/usr/bin/sudo", "/root/attac-mail/bearmail/bearmail-update"],
+                                                  stderr=subprocess.PIPE)
                 ok_messages = ["La configuration a bien été appliquée"]
+            except subprocess.CalledProcessError as exp:
+                error_messages = ["Unable to restart Postfix: (<tt>{0}</tt>)".format(exp.output)]
 
         return {
             'error_messages': error_messages,
