@@ -22,7 +22,7 @@ def escape_mail(text):
 
     <body>
         <nav class="navbar navbar-default navbar-fixed-top">
-            <div class="container">
+            <div class="container-fluid">
                 <div class="navbar-header">
                     <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
                         <span class="sr-only">Toggle navigation</span>
@@ -94,7 +94,7 @@ def escape_mail(text):
 
             % if error_messages:
                 % for msg in error_messages:
-                    <div class="alert alert-error">
+                    <div class="alert alert-danger">
                         <button type="button" class="close" data-dismiss="alert">×</button>
                         ${msg | escape_mail}
                     </div>

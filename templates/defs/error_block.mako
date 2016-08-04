@@ -3,7 +3,7 @@
 
 % if error_messages:
 % for msg in error_messages:
-<div class="alert alert-error">
+<div class="alert alert-danger">
   <button type="button" class="close" data-dismiss="alert">×</button>
   ${msg | escape_mail}
 </div>
