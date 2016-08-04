@@ -1,10 +1,12 @@
-CherryPy==3.8.0
-Mako==1.0.2
+CherryPy==7.1.0
+Mako==1.0.4
 MarkupSafe==0.23
 Naked==0.1.31
-PyYAML==3.11
-SQLAlchemy==1.0.9
 passlib==1.6.5
+pkg-resources==0.0.0
 pycrypto==2.6.1
-requests==2.8.1
+PyYAML==3.11
+requests==2.10.0
 shellescape==3.4.1
+six==1.10.0
+SQLAlchemy==1.0.14
