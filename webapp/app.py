@@ -62,7 +62,8 @@ class UserController(object):
     def _aes_decrypt(self, enc_data):
         try:
             cipher = AES.new(self._secret_key, AES.MODE_CBC, self._iv)
-            return self._strip_padding(cipher.decrypt(b64decode(enc_data)))
+            data = cipher.decrypt(b64decode(enc_data)).decode('utf-8')
+            return self._strip_padding(data)
         except Exception as e:
             raise UserControllerException("Erreur cryptographique : {0}".format(e))
 
